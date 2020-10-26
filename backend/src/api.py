@@ -185,7 +185,7 @@ def unauthorized(error):
     return jsonify({
         'success': False,
         'error': 401,
-        'message': 'runauthorized'
+        'message': 'unauthorized'
     }), 401
 
 '''
@@ -233,8 +233,7 @@ def handle_auth_error(ex):
     """
     ADD SOME MEANINGFUL COMMENT ABOUT THIS HANDLER
     """
-    response = jsonify(ex.error)
-    response.status_code = ex.status_code
+
     return jsonify({
         'success': False,
         'error': ex.status_code,
