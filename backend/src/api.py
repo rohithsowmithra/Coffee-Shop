@@ -9,7 +9,7 @@ from auth.auth import AuthError, requires_auth
 
 app = Flask(__name__)
 setup_db(app)
-CORS(app)
+CORS(app, resources={r"/.*": {"origins":"*"}})
 
 '''
 drop all schemas and re-create them
