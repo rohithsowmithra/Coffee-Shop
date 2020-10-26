@@ -48,7 +48,7 @@ In this project we have used Postman collections to test all the endpoints for e
 
 To execute these tests follow the steps below:
 
-- Install PostmanREST client
+- Install Postman REST client
 - Download the postman collection 'endpoints_postman_collection.json' from this directory.
 - Open Postman application and follow the navigation. Menu -> File -> Import -> select the json file you just downloaded -> Click OK.
 - Hit Runner button and select the collection to run.
