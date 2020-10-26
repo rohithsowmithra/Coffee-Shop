@@ -26,7 +26,7 @@ This will install all of the required packages we selected within the `requireme
 
 - [Flask](http://flask.pocoo.org/)  is a lightweight backend microservices framework. Flask is required to handle requests and responses.
 
-- [SQLAlchemy](https://www.sqlalchemy.org/) and [Flask-SQLAlchemy](https://flask-sqlalchemy.palletsprojects.com/en/2.x/) are libraries to handle the lightweight sqlite database. Since we want you to focus on auth, we handle the heavy lift for you in `./src/database/models.py`. We recommend skimming this code first so you know how to interface with the Drink model.
+- [SQLAlchemy](https://www.sqlalchemy.org/) and [Flask-SQLAlchemy](https://flask-sqlalchemy.palletsprojects.com/en/2.x/) are libraries to handle the lightweight sqlite database.
 
 - [jose](https://python-jose.readthedocs.io/en/latest/) JavaScript Object Signing and Encryption for JWTs. Useful for encoding, decoding, and verifying JWTS.
 
@@ -34,52 +34,229 @@ This will install all of the required packages we selected within the `requireme
 
 From within the `./src` directory first ensure you are working using your created virtual environment.
 
-Each time you open a new terminal session, run:
+Run api.py file in `./src` directory using below command.
 
 ```bash
-export FLASK_APP=api.py;
+python api.py
 ```
 
-To run the server, execute:
+If you are using an IDE like pycharm, open `api.py` file in `./src` directory and hit run button.
+
+## Testing
+
+In this project we have used Postman collections to test all the endpoints for expected behavior including permission checks.
+
+To execute these tests follow the steps below:
+
+- Install PostmanREST client
+- Download the postman collection 'endpoints_postman_collection.json' from this directory.
+- Open Postman application and follow the navigation. Menu -> File -> Import -> select the json file you just downloaded -> Click OK.
+- Hit Runner button and select the collection to run.
+
+>Note: 
+>1. Run your flask server before running Postman collection.
+>2. You may need to update tokens in Postman collection before running the tests as the tokens specified might have already expired.
+
+## API Reference
+
+### Getting Started
+
+- Base URL: Currently this application is hosted locally. The backend is hosted at http://127.0.0.1:5000/
+- Authentication and Authorization: This application is configured to work with [auth0](https://auth0.com/) which uses the OpenID Connect (OIDC) Protocol and OAuth 2.0 Authorization Framework to authenticate users and get their authorization to access protected resources.
+
+### Error Handling
+
+Errors are returned as JSON in the following format:
 
 ```bash
-flask run --reload
+{
+    "success": False,
+    "error": 400,
+    "message": "bad request"
+}
 ```
 
-The `--reload` flag will detect file changes and restart the server automatically.
+The API will return these error types when requests fail.
 
-## Tasks
+- 400: bad request
+- 401: unauthorized
+- 405:: method not implemented
+- 422: unprocessible entity
+- 500: internal server error
 
-### Setup Auth0
+### Endpoints
 
-1. Create a new Auth0 Account
-2. Select a unique tenant domain
-3. Create a new, single page web application
-4. Create a new API
-    - in API Settings:
-        - Enable RBAC
-        - Enable Add Permissions in the Access Token
-5. Create new API permissions:
-    - `get:drinks-detail`
-    - `post:drinks`
-    - `patch:drinks`
-    - `delete:drinks`
-6. Create new roles for:
-    - Barista
-        - can `get:drinks-detail`
-    - Manager
-        - can perform all actions
-7. Test your endpoints with [Postman](https://getpostman.com). 
-    - Register 2 users - assign the Barista role to one and Manager role to the other.
-    - Sign into each account and make note of the JWT.
-    - Import the postman collection `./starter_code/backend/udacity-fsnd-udaspicelatte.postman_collection.json`
-    - Right-clicking the collection folder for barista and manager, navigate to the authorization tab, and including the JWT in the token field (you should have noted these JWTs).
-    - Run the collection and correct any errors.
-    - Export the collection overwriting the one we've included so that we have your proper JWTs during review!
+GET /drinks
 
-### Implement The Server
+- Fetches all the drink details in short data representation (only color and parts are included in response, but not namee field).
+- Sample response:
+```bash
+{
+  "drinks": [
+    {
+      "id": 1, 
+      "recipe": [
+        {
+          "color": "Blue", 
+          "parts": 2
+        }, 
+        {
+          "color": "Green", 
+          "parts": 1
+        }, 
+        {
+          "color": "orange", 
+          "parts": 3
+        }
+      ], 
+      "title": "Mocca"
+    }
+  ],
+  "success": true
+}
+```
 
-There are `@TODO` comments throughout the `./backend/src`. We recommend tackling the files in order and from top to bottom:
+GET /drinks-detail
 
-1. `./src/auth/auth.py`
-2. `./src/api.py`
+- Fetches all the drink details in long data representation (full recipe details are included in response) if the user has 'get:drinks-detail' permission.
+- Sample response:
+```bash
+{
+  "drinks": [
+    {
+      "id": 1, 
+      "recipe": [
+        {
+          "color": "Blue", 
+          "name": "BlueBerry", 
+          "parts": 2
+        }, 
+        {
+          "color": "Green", 
+          "name": "GreenBerry", 
+          "parts": 1
+        }, 
+        {
+          "color": "orange", 
+          "name": "Orange", 
+          "parts": 3
+        }
+      ], 
+      "title": "Mocca"
+    }
+  ], 
+  "success": true
+}
+```
+
+POST /drinks
+
+- Creates a new drink if user has 'post:drinks' permission
+- Sample request:
+```bash
+{
+	"id": -1,
+	"title": "Cappucino",
+	"recipe": [{
+		"name": "blueberry",
+		"color": "Blue",
+		"parts": 2
+	}, {
+		"name": "cranberry",
+		"color": "red",
+		"parts": 2
+	}]
+}
+```
+- Sample response:
+```bash
+{
+  "drinks": [
+    {
+      "id": 2, 
+      "recipe": [
+        {
+          "color": "Blue", 
+          "name": "blueberry", 
+          "parts": 2
+        }, 
+        {
+          "color": "red", 
+          "name": "cranberry", 
+          "parts": 2
+        }
+      ], 
+      "title": "Cappucino"
+    }
+  ], 
+  "success": true
+}
+```
+
+PATCH /drinks/<drink_id>
+
+- updates drink details if user has 'patch:drinks' permission.
+- Request Arguments: drink_id: int
+- Sample request:
+```bash
+{
+	"id": 1,
+	"recipe": [{
+		"color": "Blue",
+		"name": "BlueBerry",
+		"parts": 2
+	}, {
+		"color": "Green",
+		"name": "GreenBerry",
+		"parts": 1
+	}, {
+		"color": "orange",
+		"name": "Fresh Orange",
+		"parts": 2
+	}],
+	"title": "Mocca"
+}
+```
+
+- Sample response:
+```bash
+{
+  "drinks": [
+    {
+      "id": 1, 
+      "recipe": [
+        {
+          "color": "Blue", 
+          "name": "BlueBerry", 
+          "parts": 2
+        }, 
+        {
+          "color": "Green", 
+          "name": "GreenBerry", 
+          "parts": 1
+        }, 
+        {
+          "color": "orange", 
+          "name": "Fresh Orange", 
+          "parts": 2
+        }
+      ], 
+      "title": "Mocca"
+    }
+  ], 
+  "success": true
+}
+
+```
+
+DELETE /drinks/<drink_id>
+
+- deletes a drink with specified id from the database if the user has 'delete:drinks' permission.
+- Request Arguments: drink_id: int
+- Sample response:
+```bash
+{
+  "deleted": 3, 
+  "success": true
+}
+```
