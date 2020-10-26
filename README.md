@@ -4,7 +4,7 @@
 
 This project is about helping an institution to open a digitally enabled cafe for students to order drinks, socialize, and study hard. They mainly need help in setting up their menu experience.
 
-The application does the following:
+This application does the following:
 
 1) Display graphics representing the ratios of ingredients in each drink.
 2) Allows public users to view drink names and graphics.
@@ -39,4 +39,4 @@ This project uses Flask to build the apis. Endpoints needs to be integrated with
 
 ## Authors
 
-Rohith has worked on implementing most part of the backend and documentation (Readme.md) files, and quite a little on the frontend as Udacity has already already had them ready.
+Rohith has worked on implementing most part of the backend and documentation (Readme.md) files, and quite a little on the frontend as Udacity has already had them ready.
