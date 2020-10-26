@@ -217,12 +217,29 @@ Error: 500 (internal server error)
 '''
 
 @app.errorhandler(500)
-def unauthorized(error):
+def internal_server_error(error):
     return jsonify({
         'success': False,
         'error': 500,
         'message': 'internal server error'
     }), 500
+
+'''
+Error: 401 (Authentication Error)
+'''
+
+@app.errorhandler(AuthError)
+def handle_auth_error(ex):
+    """
+    ADD SOME MEANINGFUL COMMENT ABOUT THIS HANDLER
+    """
+    response = jsonify(ex.error)
+    response.status_code = ex.status_code
+    return jsonify({
+        'success': False,
+        'error': ex.status_code,
+        'message': ex.error
+    }), 401
 
 
 ## Main method implemented below
