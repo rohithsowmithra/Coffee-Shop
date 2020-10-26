@@ -16,19 +16,27 @@ drop all schemas and re-create them
 '''
 # db_drop_and_create_all()
 
+
 @app.after_request
 def after_request(response):
 
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
-    response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
+    response.headers.add(
+        'Access-Control-Allow-Headers',
+        'Content-Type,Authorization,true')
+    response.headers.add(
+        'Access-Control-Allow-Methods',
+        'GET, POST, PUT, PATCH, DELETE, OPTIONS')
 
     return response
 
-## ROUTES
+
+# ROUTES
+
 
 '''
 Endpoint: GET /drinks
 '''
+
 
 @app.route('/drinks', methods=['GET'])
 def get_drinks():
@@ -43,6 +51,8 @@ def get_drinks():
 '''
 Endpoint: GET /drinks-detail
 '''
+
+
 @app.route('/drinks-detail', methods=['GET'])
 @requires_auth('get:drinks-detail')
 def get_drink_details(payload):
@@ -54,41 +64,42 @@ def get_drink_details(payload):
         'drinks': [drink.long() for drink in drinks]
     }), 200
 
+
 '''
 Endpoint: POST /drinks
 '''
 
+
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
 def add_new_drink(payload):
+    body = request.get_json()
 
-     body = request.get_json()
+    if not body:
+        abort(400)
 
-     if not body:
-         abort(400)
+    if not ('title' in body and 'recipe' in body):
+        abort(422)
 
-     if not ('title' in body and 'recipe' in body):
-         abort(422)
+    title = body.get('title')
+    recipe = body.get('recipe')
 
-     title = body.get('title')
-     recipe = body.get('recipe')
+    drink_obj = Drink(title=title, recipe=json.dumps(recipe))
 
-     drink_obj = Drink(title=title, recipe=json.dumps(recipe))
+    drink_obj.insert()
 
-     drink_obj.insert()
+    newly_added_drink = Drink.query.filter_by(id=drink_obj.id).first()
 
-     newly_added_drink = Drink.query.filter_by(id=drink_obj.id).first()
+    return jsonify({
+        'success': True,
+        'drinks': [newly_added_drink.long()]
+    }), 200
 
-     print("newly added obj is ",newly_added_drink)
-
-     return jsonify({
-         'success': True,
-         'drinks': [newly_added_drink.long()]
-     }), 200
 
 '''
 Endpoint: PATCH /drinks/<drink_id>
 '''
+
 
 @app.route('/drinks/<int:drink_id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
@@ -122,12 +133,14 @@ def update_drink(payload, drink_id):
             'success': True,
             'drinks': [Drink.long(drink_obj)]
         }), 200
-    except:
+    except Exception:
         abort(422)
+
 
 '''
 Endpoint: DELETE /drinks/<drink_id>
 '''
+
 
 @app.route('/drinks/<int:drink_id>', methods=['DELETE'])
 @requires_auth('delete:drinks')
@@ -145,28 +158,31 @@ def delete_drink(token, drink_id):
             'success': True,
             'deleted': drink_id
         }), 200
-    except:
+    except Exception:
         abort(422)
 
 
+# Error Handling
 
-## Error Handling
 
 '''
 Error: 422 (unprocessable entity)
 '''
 
+
 @app.errorhandler(422)
 def unprocessable(error):
     return jsonify({
-                    "success": False,
-                    "error": 422,
-                    "message": "unprocessable entity"
-                    }), 422
+        "success": False,
+        "error": 422,
+        "message": "unprocessable entity"
+        }), 422
+
 
 '''
 Error: 400 (bad request)
 '''
+
 
 @app.errorhandler(400)
 def bad_request(error):
@@ -176,9 +192,11 @@ def bad_request(error):
         "message": 'Bad Request'
     }), 400
 
+
 '''
 Error: 401 (unauthorized user)
 '''
+
 
 @app.errorhandler(401)
 def unauthorized(error):
@@ -188,9 +206,11 @@ def unauthorized(error):
         'message': 'unauthorized'
     }), 401
 
+
 '''
 Error: 404 (resource not found)
 '''
+
 
 @app.errorhandler(404)
 def not_found(error):
@@ -200,9 +220,11 @@ def not_found(error):
         'message': 'resource not found'
     }), 404
 
+
 '''
 Error: 405 (method not implemented)
 '''
+
 
 @app.errorhandler(405)
 def method_not_allowed(error):
@@ -212,9 +234,11 @@ def method_not_allowed(error):
         'message': 'method not allowed on this resource'
     }), 405
 
+
 '''
 Error: 500 (internal server error)
 '''
+
 
 @app.errorhandler(500)
 def internal_server_error(error):
@@ -224,9 +248,11 @@ def internal_server_error(error):
         'message': 'internal server error'
     }), 500
 
+
 '''
 Error: 401 (Authentication Error)
 '''
+
 
 @app.errorhandler(AuthError)
 def handle_auth_error(ex):
@@ -241,7 +267,8 @@ def handle_auth_error(ex):
     }), 401
 
 
-## Main method implemented below
+# Main method implemented below
+
 
 if __name__ == "__main__":
     app.run(debug=True)
