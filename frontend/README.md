@@ -1,4 +1,4 @@
-# Coffee Shop Frontend
+# Digital Coffee Shop Frontend
 
 ## Getting Setup
 
@@ -16,7 +16,7 @@ The Ionic Command Line Interface is required to serve and build the frontend. In
 
 #### Installing project dependencies
 
-This project uses NPM to manage software dependencies. NPM Relies on the package.json file located in the `frontend` directory of this repository. After cloning, open your terminal and run:
+This project uses NPM to manage software dependencies. NPM Relies on the package.json file located in this directory. Run below command to install the dependencies:
 
 ```bash
 npm install
@@ -24,17 +24,9 @@ npm install
 
 >_tip_: **npm i** is shorthand for **npm install**
 
-## Required Tasks
-
-### Configure Enviornment Variables
-
-Ionic uses a configuration file to manage environment variables. These variables ship with the transpiled software and should not include secrets.
-
-- Open `./src/environments/environments.ts` and ensure each variable reflects the system you stood up for the backend.
-
 ## Running Your Frontend in Dev Mode
 
-Ionic ships with a useful development server which detects changes and transpiles as you work. The application is then accessible through the browser on a localhost port. To run the development server, cd into the `frontend` directory and run:
+Ionic ships with a useful development server which detects changes and transpiles as you work. The application is then accessible through the browser on a localhost port. To run the development server, run below command:
 
 ```bash
 ionic serve
@@ -44,8 +36,6 @@ ionic serve
 [Checkout the Ionic docs to learn more](https://ionicframework.com/docs/cli/commands/build)
 
 ## Key Software Design Relevant to Our Coursework
-
-The frontend framework is a bit beefy; here are the two areas to focus your study.
 
 ### Authentication
 
